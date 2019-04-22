@@ -1,9 +1,14 @@
+import yaml
+import pandas as pd
+
 from model.fcn import FCN
 from data.loader import ImageStream
 from keras.callbacks import TensorBoard, ModelCheckpoint, CSVLogger
 
-ROOT = "/data/Datasets/SCUT-FBP5500_v2/"
-stream = ImageStream(ROOT + "Files.npy", ROOT + "ratings.npy", ROOT + "Images/")
+config = yaml.load(open("config.yml"))
+root = config["dataset_root"]
+table = pd.read_excel(root + "All_Ratings.xlsx")
+stream = ImageStream(table["Filename"], table["Rating"], root + "Images/")
 
 fcn = FCN()
 fcn.build_beaty_predictor(input_shape=(240, 240, 3))
@@ -18,4 +23,4 @@ fcn.training_aspect.fit_generator(
         CSVLogger("train_log.csv")
     ]
 )
-fcn.testing_aspect.save_weights(ROOT + "beautifier_predictor_final.h5")
+fcn.testing_aspect.save_weights(root + "beautifier_predictor_final.h5")

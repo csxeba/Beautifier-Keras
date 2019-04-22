@@ -10,14 +10,14 @@ from .augmentation import AugmentationConfig
 class ImageStream:
 
     def __init__(self,
-                 filenames_cache,
-                 rates_cache,
+                 filenames,
+                 ratings,
                  image_root,
                  batch_size=32,
                  augmentation_config: AugmentationConfig=None):
 
-        self.files = np.array([os.path.join(image_root, f) for f in np.load(filenames_cache)])
-        self.rates = np.load(rates_cache) / 5.
+        self.files = np.array([os.path.join(image_root, f) for f in filenames])
+        self.ratings = ratings
         self.batch_size = batch_size
         self.indices = np.arange(len(self.files))
         self.processor = ImageProcessor(network_input_shape=(240, 240),
@@ -41,8 +41,8 @@ class ImageStream:
             for i, index in enumerate(np.random.choice(self.indices, size=self.batch_size)):
                 image = self.load_image(self.files[index])
                 X[i] = self.processor(image)
-                Y[i] = self.rates[index]
-            yield X, Y
+                Y[i] = self.ratings[index]
+            yield X / 255., (Y / 5.) - 0.5
 
     def __iter__(self):
         return self
