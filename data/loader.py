@@ -49,6 +49,7 @@ class ImageStream:
         print(["ImageStream: No cache, caching now..."])
         obj = cls.from_pandas(root, batch_size, augmentation_config)
         np.savez(os.path.join(root, "beauty_cache.npz"), files=obj.files, rates=obj.ratings)
+        return obj
 
     @property
     def steps_per_epoch(self):
