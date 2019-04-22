@@ -16,7 +16,8 @@ class ImageStream:
                  batch_size=32,
                  augmentation_config: AugmentationConfig=None):
 
-        self.files = np.array([os.path.join(image_root, f) for f in filenames])
+        self.files = np.array(filenames)
+        self.image_root = image_root
         self.ratings = ratings
         self.batch_size = batch_size
         self.indices = np.arange(len(self.files))
@@ -24,12 +25,36 @@ class ImageStream:
                                         augmentation_config=augmentation_config)
         self._iterator = self.make_iterator()
 
+    @classmethod
+    def from_pandas(cls, root, batch_size=32, augmentation_config: AugmentationConfig=None):
+
+        import pandas as pd
+        image_root = os.path.join(root, "Images/")
+        table = pd.read_excel(root + "All_Ratings.xlsx")
+        files = table["Filename"].as_matrix()
+        rates = table["Rating"].as_matrix()
+        return cls(files, rates, image_root, batch_size, augmentation_config)
+
+    @classmethod
+    def from_arrays(cls, root, batch_size=32, augmentation_config: AugmentationConfig=None):
+        npz = np.load(os.path.join(root, "beauty_cache.npz"))
+        return cls(npz["files"], npz["rates"], root, batch_size, augmentation_config)
+
+    @classmethod
+    def from_cache(cls, root, batch_size=32, augmentation_config: AugmentationConfig=None):
+        if os.path.exists(os.path.join(root, "beauty_cache.npz")):
+            return cls.from_arrays(root, batch_size, augmentation_config)
+
+        print(["ImageStream: No cache, caching now..."])
+        obj = cls.from_pandas(root, batch_size, augmentation_config)
+        np.savez(os.path.join(root, "beauty_cache.npz"), files=obj.files, rates=obj.ratings)
+
     @property
     def steps_per_epoch(self):
         return int(round(len(self.files) / self.batch_size))
 
     def load_image(self, path):
-        image = cv2.imread(path, cv2.IMREAD_COLOR)
+        image = cv2.imread(os.path.join(self.image_root, path), cv2.IMREAD_COLOR)
         if image is None:
             raise RuntimeError("No such image file:", path)
         return image
