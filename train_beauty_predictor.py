@@ -1,3 +1,5 @@
+import os
+
 import yaml
 import pandas as pd
 
@@ -6,7 +8,7 @@ from data.loader import ImageStream
 from keras.callbacks import TensorBoard, ModelCheckpoint, CSVLogger
 
 config = yaml.load(open("config.yml"))
-root = config["dataset_root"]
+root = os.path.expanduser(config["dataset_root"])
 table = pd.read_excel(root + "All_Ratings.xlsx")
 stream = ImageStream(table["Filename"], table["Rating"], root + "Images/")
 
