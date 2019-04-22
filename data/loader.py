@@ -37,8 +37,9 @@ class ImageStream:
 
     @classmethod
     def from_arrays(cls, root, batch_size=32, augmentation_config: AugmentationConfig=None):
+        image_root = os.path.join(root, "Images/")
         npz = np.load(os.path.join(root, "beauty_cache.npz"))
-        return cls(npz["files"], npz["rates"], root, batch_size, augmentation_config)
+        return cls(npz["files"], npz["rates"], image_root, batch_size, augmentation_config)
 
     @classmethod
     def from_cache(cls, root, batch_size=32, augmentation_config: AugmentationConfig=None):

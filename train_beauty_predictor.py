@@ -4,7 +4,7 @@ from keras.callbacks import TensorBoard, ModelCheckpoint, CSVLogger
 
 root = "data/SCUT/"
 aug = AugmentationConfig()
-stream = ImageStream.from_cache(root + "Images/", batch_size=32, augmentation_config=aug)
+stream = ImageStream.from_cache(root, batch_size=32, augmentation_config=aug)
 
 model.fit_generator(
     stream, stream.steps_per_epoch,
