@@ -69,7 +69,7 @@ class ImageStream:
                 image = self.load_image(self.files[index])
                 X[i] = self.processor(image)
                 Y[i] = self.ratings[index]
-            yield X / 255. - .5, Y / 5. - .5
+            yield X / 255. - .5, Y / 5.
 
     def __iter__(self):
         return self
